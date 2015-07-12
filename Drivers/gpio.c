@@ -25,7 +25,7 @@ void gpio_out_pp_up_init(GPIO_TypeDef *gpio, uint32_t gpio_pin)
 //上拉输入
 void gpio_in_up_init(GPIO_TypeDef *gpio, uint32_t gpio_pin)
 {
-	gpio_config(gpio, gpio_pin, GPIO_Mode_IN, GPIO_OType_PP, GPIO_PuPd_UP, GPIO_Speed_100MHz);
+	gpio_config(gpio, gpio_pin, GPIO_Mode_IN, GPIO_OType_OD, GPIO_PuPd_UP, GPIO_Speed_100MHz);
 }
 
 //下拉输入
@@ -46,5 +46,9 @@ void gpio_af_od_no_init(GPIO_TypeDef *gpio, uint32_t gpio_pin)
 	gpio_config(gpio, gpio_pin, GPIO_Mode_AF, GPIO_OType_OD, GPIO_PuPd_NOPULL, GPIO_Speed_100MHz);
 }
 
-
+//复用开漏上拉
+void gpio_af_od_up_init(GPIO_TypeDef *gpio, uint32_t gpio_pin)
+{
+	gpio_config(gpio, gpio_pin, GPIO_Mode_AF, GPIO_OType_OD, GPIO_PuPd_UP, GPIO_Speed_100MHz);
+}
 

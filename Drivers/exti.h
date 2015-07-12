@@ -3,6 +3,6 @@
 
 #include "stm32f4xx.h"
 
-void exti_configuration(GPIO_TypeDef *gpiox, u8 pin_num);
+void exti_config(GPIO_TypeDef *gpiox, u8 pin_num);
 
 #endif

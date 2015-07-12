@@ -1,7 +1,7 @@
 #include "iic.h"
 #include "gpio.h"
 
-void iic_configuration(void)
+void iic_config(void)
 {
 	I2C_InitTypeDef  I2C_InitStructure;
 	
@@ -75,7 +75,7 @@ void iic_read_bytes(u8 id, u8 reg, u8 length, u8* buf)
   	while(!I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_MODE_SELECT));						//EV5
   	I2C_Send7bitAddress(I2C1, id, I2C_Direction_Receiver);							//∑¢ÀÕ∂¡µÿ÷∑
   	while(!I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED));			//EV6 
-	I2C_Cmd(I2C1, ENABLE);															
+	I2C_Cmd(I2C1, ENABLE);														
 	for(i=0; i<length; i++)
 	{
  		while(!(I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_BYTE_RECEIVED))){}

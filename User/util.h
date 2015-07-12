@@ -10,6 +10,6 @@
 
 void rcc_clock_enable(void);
 void print_clock_freq(void);
-void nvic_configuration(uint8_t irq_channel, uint8_t priority);
+void nvic_config(uint8_t irq_channel, uint8_t priority);
 
 #endif

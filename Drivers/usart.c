@@ -2,7 +2,7 @@
 #include "util.h"
 #include "gpio.h"
 
-void usart_configuration(USART_TypeDef* usartx, uint32_t baudRate)
+void usart_config(USART_TypeDef* usartx, uint32_t baudRate)
 {
 	USART_InitTypeDef USART_InitStructure;
 	GPIO_TypeDef* gpio_txd;
@@ -90,7 +90,51 @@ void usart_configuration(USART_TypeDef* usartx, uint32_t baudRate)
 	USART_Cmd(usartx,ENABLE);
 	USART_ClearFlag(usartx, USART_FLAG_TC);
 	
-	nvic_configuration(irq_channel, 4);
+	nvic_config(irq_channel, 4);
+}
+
+void usart1_init(uint32_t baudRate)
+{
+	USART_InitTypeDef USART_InitStructure;
+	
+	GPIO_PinAFConfig(GPIOB, GPIO_PinSource6, GPIO_AF_USART1);
+    GPIO_PinAFConfig(GPIOB, GPIO_PinSource7, GPIO_AF_USART1);
+	gpio_af_pp_up_init(GPIOB, GPIO_Pin_6|GPIO_Pin_7);
+	
+	USART_InitStructure.USART_BaudRate = baudRate;
+	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+	USART_InitStructure.USART_StopBits = USART_StopBits_1;
+	USART_InitStructure.USART_Parity = USART_Parity_No;
+	USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
+	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+	USART_Init(USART1, &USART_InitStructure); 
+	USART_ITConfig(USART1, USART_IT_RXNE,ENABLE);
+	USART_Cmd(USART1, ENABLE);
+	USART_ClearFlag(USART1, USART_FLAG_TC);
+	
+	nvic_config(USART1_IRQn, 4);
+}
+
+void uart4_init(uint32_t baudRate)
+{
+	USART_InitTypeDef USART_InitStructure;
+	
+	GPIO_PinAFConfig(GPIOC, GPIO_PinSource10, GPIO_AF_UART4);
+    GPIO_PinAFConfig(GPIOC, GPIO_PinSource11, GPIO_AF_UART4);
+	gpio_af_pp_up_init(GPIOC, GPIO_Pin_10|GPIO_Pin_11);
+	
+	USART_InitStructure.USART_BaudRate = baudRate;
+	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+	USART_InitStructure.USART_StopBits = USART_StopBits_1;
+	USART_InitStructure.USART_Parity = USART_Parity_No;
+	USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
+	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+	USART_Init(UART4, &USART_InitStructure); 
+	USART_ITConfig(UART4, USART_IT_RXNE,ENABLE);
+	USART_Cmd(UART4, ENABLE);
+	USART_ClearFlag(UART4, USART_FLAG_TC);
+	
+	nvic_config(UART4_IRQn, 4);
 }
 
 int fputc(int ch, FILE *f)

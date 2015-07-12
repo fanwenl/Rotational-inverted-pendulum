@@ -1,8 +1,8 @@
 #include "delay.h"
 
-vu32 TimingDelay=0;
+vu32 systick_counter=0;
 
-void delay_configuration(void)
+void delay_config(void)
 {
 	SysTick_CLKSourceConfig(SysTick_CLKSource_HCLK_Div8);
 	if (SysTick_Config(SystemCoreClock / 1000000))
@@ -25,15 +25,15 @@ void delay_cmd(FunctionalState state)
 void delay_ms(vu32 nTime)
 {
 	delay_cmd(ENABLE);
-	TimingDelay = nTime*1000;
-	while(TimingDelay != 0);
+	systick_counter = nTime*1000;
+	while(systick_counter != 0);
 	delay_cmd(DISABLE);
 }
 
 void delay_us(vu32 nTime)
 {
 	delay_cmd(ENABLE);
-	TimingDelay = nTime;
-	while(TimingDelay != 0);
+	systick_counter = nTime;
+	while(systick_counter != 0);
 	delay_cmd(DISABLE);
 }

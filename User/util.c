@@ -3,6 +3,8 @@
 
 void rcc_clock_enable(void)
 {	
+	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
+	
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);	
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
@@ -25,7 +27,7 @@ void print_clock_freq(void)
 }
 
 //priority: 0~15, 越小优先级越高
-void nvic_configuration(uint8_t irq_channel, uint8_t priority)
+void nvic_config(uint8_t irq_channel, uint8_t priority)
 {
 	NVIC_InitTypeDef NVIC_InitStructure;
 	uint8_t pre, sub;

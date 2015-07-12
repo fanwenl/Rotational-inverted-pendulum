@@ -3,7 +3,7 @@
 #include "gpio.h"
 #include "usart.h"
 
-void exti_configuration(GPIO_TypeDef *gpiox, u8 pin_num)
+void exti_config(GPIO_TypeDef *gpiox, u8 pin_num)
 {
 	EXTI_InitTypeDef EXTI_InitStructure;
 	u8 exti_port_source_gpio;
@@ -69,7 +69,7 @@ void exti_configuration(GPIO_TypeDef *gpiox, u8 pin_num)
 		irq_channel = pin_num + 6;
 	}
 	
-	nvic_configuration(irq_channel, 10);
+	nvic_config(irq_channel, 10);
 }
 
 //EXTI1_IRQHandler 
@@ -100,39 +100,3 @@ void EXTI15_10_IRQHandler(void)
 {
 	
 }
-
-void EXTILine0_Config(void)
-{
-  EXTI_InitTypeDef   EXTI_InitStructure;
-  GPIO_InitTypeDef   GPIO_InitStructure;
-  NVIC_InitTypeDef   NVIC_InitStructure;
-
-  /* Enable SYSCFG clock */
-  RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
-  
-  /* Configure PA0 pin as input floating */
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
-  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
-  GPIO_Init(GPIOA, &GPIO_InitStructure);
-
-  /* Connect EXTI Line0 to PA0 pin */
-  SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOA, EXTI_PinSource0);
-
-  /* Configure EXTI Line0 */
-  EXTI_InitStructure.EXTI_Line = EXTI_Line0;
-  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;  
-  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-  EXTI_Init(&EXTI_InitStructure);
-
-  /* Enable and set EXTI Line0 Interrupt to the lowest priority */
-  NVIC_InitStructure.NVIC_IRQChannel = EXTI0_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-  NVIC_Init(&NVIC_InitStructure);
-}
-
-
-
