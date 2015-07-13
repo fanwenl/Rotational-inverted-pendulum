@@ -1,9 +1,8 @@
-#include "spi.h"
 #include "touch.h"
+#include "spi.h"
 #include "lcd.h"
-#include "usart.h"
 #include "delay.h"
-#include "math.h"
+#include <math.h>
 #include "gui.h"
 
 float xFac = -0.068097;
@@ -16,9 +15,9 @@ u16 readAdc(u8 cmd)
 {
 	u8 high, low;
 	u16 res = 0;
-	spi_readWriteByte(cmd);
-	high = spi_readWriteByte(0x00);
-	low = spi_readWriteByte(0x00);
+	spi_read_write_byte(cmd);
+	high = spi_read_write_byte(0x00);
+	low = spi_read_write_byte(0x00);
 	res = high<<8;
 	res = (res | low)>>3;
 	if(cmd == CMD_RDY && res == 4095){
@@ -204,40 +203,12 @@ void touchAdjust(void)
 	xOff=(240-xFac*(posTmp[1][0]+posTmp[0][0]))/2;//得到xoff  
 	yFac=(float)280/(posTmp[2][1]-posTmp[0][1]);//得到yfac
 	yOff=(320-yFac*(posTmp[2][1]+posTmp[0][1]))/2;//得到yoff
-//	saveAdjustResult();
 	
 	lcd_clear(WHITE);
 	lcd_show_str(5, 140, "adjust succeed", BLUE);
 	while(T_IRQ){}
 	lcd_clear(WHITE);
 }
-
-//void saveAdjustResult(void)
-//{
-//	u32 buffer[5];
-//	buffer[0] = 0xabcd;
-//	buffer[1] = (u16)((0.0f-xFac) * 1000 + 0.5f);
-//	buffer[2] = (u16)((0.0f-xOff) * 1000 + 0.5f);
-//	buffer[3] = (u16)(yFac * 1000 + 0.5f);
-//	buffer[4] = (u16)(yOff * 1000 + 0.5f);
-//	//Flash_Write32BitDatas(FLASH_USER_START_ADDR, 5, buffer);
-//}
-
-//void getAdjustValue(void)
-//{
-//	u32 buffer[5];
-//	Flash_Read32BitDatas(FLASH_USER_START_ADDR, 5, buffer);
-//	if(buffer[0] == 0xabcd){
-//		xFac = 0.0f - (float)(buffer[1] / 1000.0f);
-//		xOff = 0.0f - (float)(buffer[2] / 1000.0f);
-//		yFac = (float)(buffer[3] / 1000.0f);
-//		yOff = (float)(buffer[4] / 1000.0f);
-//	}
-//	else{
-//		printf("buffer[0] = %x\r\n", buffer[0]);
-//		touchAdjust();
-//	}
-//}
 
 void waitButton(u16 *x, u16 *y)
 {
@@ -255,32 +226,19 @@ void waitButton(u16 *x, u16 *y)
 
 void invoking(void)
 {
-		waitButton(&xPos, &yPos);
-		if(isInRange(xPos, yPos, APP1_X, APP1_Y)){
-//			lcdFill(APP1_X-OFF_X, APP1_Y-OFF_Y, APP1_X+OFF_X, APP1_Y+OFF_Y, WHITE);
-//			delay_ms(100);
-//			gui_drawHome();
-			side_to_side();
-			gui_drawHome();
-		}
-		else if(isInRange(xPos, yPos, APP2_X, APP2_Y)){
-		//	lcd_fill(APP2_X-OFF_X, APP2_Y-OFF_Y, APP2_X+OFF_X, APP2_Y+OFF_Y, WHITE);
-			delay_ms(100);
-			starts_swinging();
-			gui_drawHome();
-		}
-		else if(isInRange(xPos, yPos, APP3_X, APP3_Y)){
-	//		lcd_fill(APP3_X-OFF_X, APP3_Y-OFF_Y, APP3_X+OFF_X, APP3_Y+OFF_Y, WHITE);
-			delay_ms(100);
-			inverted_pendulum();
-			gui_drawHome();
-		}
-			else if(isInRange(xPos, yPos, APP4_X, APP4_Y)){
-	//		lcd_fill(APP3_X-OFF_X, APP3_Y-OFF_Y, APP3_X+OFF_X, APP3_Y+OFF_Y, WHITE);
-			delay_ms(100);
-			circular_motion();
-			gui_drawHome();
-		}
+	waitButton(&xPos, &yPos);
+	if(isInRange(xPos, yPos, APP1_X, APP1_Y)){
+		side_to_side();
+	}
+	else if(isInRange(xPos, yPos, APP2_X, APP2_Y)){
+		starts_swinging();
+	}
+	else if(isInRange(xPos, yPos, APP3_X, APP3_Y)){
+		inverted_pendulum();
+	}
+		else if(isInRange(xPos, yPos, APP4_X, APP4_Y)){
+		circular_motion();
+	}
 }
 
 

@@ -1,20 +1,22 @@
 #ifndef __LCD_H__
 #define __LCD_H__
 
-#include "stm32f4xx.h"
+#include "stm32f4xx_fsmc.h"
 #include "bitband.h"
 
 //¶¨ÒåLCDµÄ³ß´ç	
 #define LCD_W 240
 #define LCD_H 320
 
+#define T_IRQ	PcInBit(5)
+
 #define LCD_LED_A	PbOutBit(1)
 #define LCD_RESET	PfOutBit(11)
 
 typedef struct
 {
-	u16 LCD_REG;
-	u16 LCD_RAM;
+	uint16_t LCD_REG;
+	uint16_t LCD_RAM;
 } LCD_TypeDef;			    
 #define LCD_BASE	((u32)(0x6C000000 | 0x0000007E))
 #define LCD			((LCD_TypeDef *) LCD_BASE)
@@ -49,28 +51,28 @@ typedef struct
 
 void lcd_init(void);
 
-void lcd_write_reg(u16 reg);
-void lcd_write_data(u16 dat);
-void lcd_write_reg_data(u16 reg, u16 dat);
-u16 lcd_read_data(void);
-u16 lcd_read_reg(u16 reg);
+void lcd_write_reg(uint16_t reg);
+void lcd_write_data(uint16_t dat);
+void lcd_write_reg_data(uint16_t reg, uint16_t dat);
+uint16_t lcd_read_data(void);
+uint16_t lcd_read_reg(uint16_t reg);
 void lcd_prepare_write_ram(void);
-void lcd_write_ram(u16 color);
-void lcd_set_cursor(u16 x, u16 y);
-u16 lcd_read_point_color(u16 x, u16 y);
+void lcd_write_ram(uint16_t color);
+void lcd_set_cursor(uint16_t x, uint16_t y);
+uint16_t lcd_read_point_color(uint16_t x, uint16_t y);
 void lcd_display_on(void);
 void lcd_display_off(void);
-void lcd_set_window(u16 x1, u16 y1, u16 x2, u16 y2);
+void lcd_set_window(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2);
 
-void lcd_clear(u16 color);
-void lcd_draw_point(u16 x, u16 y, u16 color);
-void lcd_fill(u16 xStart, u16 yStart, u16 xEnd, u16 yEnd, u16 color);
-void lcd_draw_big_point(u16 x, u16 y, u16 color);
-void lcd_draw_line(u16 x1, u16 y1, u16 x2, u16 y2, u16 color);
-void lcd_draw_rectangle(u16 x1, u16 y1, u16 x2, u16 y2, u16 color);
-void lcd_draw_circle(u16 x0, u16 y0, u8 r, u16 color);
-void lcd_show_char(u16 x, u16 y, u8 num, u16 color);
-void lcd_show_str(u16 x, u16 y, const char *p, u16 color);
-void lcd_show_num(u16 x, u16 y, u32 num, u16 color);
+void lcd_clear(uint16_t color);
+void lcd_draw_point(uint16_t x, uint16_t y, uint16_t color);
+void lcd_fill(uint16_t xStart, uint16_t yStart, uint16_t xEnd, uint16_t yEnd, uint16_t color);
+void lcd_draw_big_point(uint16_t x, uint16_t y, uint16_t color);
+void lcd_draw_line(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color);
+void lcd_draw_rectangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color);
+void lcd_draw_circle(uint16_t x0, uint16_t y0, uint8_t r, uint16_t color);
+void lcd_show_char(uint16_t x, uint16_t y, uint8_t num, uint16_t color);
+void lcd_show_str(uint16_t x, uint16_t y, const char *p, uint16_t color);
+void lcd_show_num(uint16_t x, uint16_t y, u32 num, uint16_t color);
 
 #endif

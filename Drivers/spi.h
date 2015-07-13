@@ -4,10 +4,10 @@
 #include "stm32f4xx_spi.h"
 #include "bitband.h"
 
-#define SPI2_CS		PaOutBit(2)
+#define T_CS	PaOutBit(3)
 
-void spi2_config(void);
-u8 spi2_read_write_byte(u8 txData);
-void spi2_set_speed(u8 speed);
+void spi_config(void);
+u8 spi_read_write_byte(u8 txData);
+void spi_set_speed(u8 speed);
 
 #endif

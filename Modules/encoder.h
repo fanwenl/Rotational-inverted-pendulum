@@ -3,7 +3,7 @@
 
 #include "stm32f4xx_tim.h"
 
-#define ENCODER_PPR 		600
+#define ENCODER_PPR 		(500*16)
 #define ENCODER_RELOAD 		0XFFFFFFFF
 #define COUNTER_RESET 		0X7FFFFFFF
 

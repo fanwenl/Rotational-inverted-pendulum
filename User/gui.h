@@ -1,9 +1,9 @@
 #ifndef __GUI_H__
 #define __GUI_H__
 
-#include "stm32f4xx.h"
+#include <stdint.h>
 
-#define CENTER_X	50
+#define CENTER_X	60
 #define CENTER_Y	150
 
 #define OFF_X	40
@@ -21,9 +21,9 @@
 #define APP4_X	(CENTER_X)
 #define APP4_Y	(CENTER_Y+1*OFF_Y)
 
-void gui_drawIcon(u16 x, u16 y, char *name, u16 color);
+void gui_drawIcon(uint16_t x, uint16_t y, char *name, uint16_t color);
 void gui_drawHome(void);
-u8 isInRange(u16 xPos, u16 yPos, u16 appx, u16 appy);
+uint8_t isInRange(uint16_t xPos, uint16_t yPos, uint16_t appx, uint16_t appy);
 void side_to_side(void);
 void starts_swinging(void);
 void inverted_pendulum(void);

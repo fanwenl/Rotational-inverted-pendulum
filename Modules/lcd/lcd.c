@@ -1,9 +1,10 @@
 #include "lcd.h"
-#include "util.h"
+#include "gpio.h"
 #include "delay.h"
 #include <stdio.h>
+#include "spi.h"
 
-extern const u8 ASCII_1608[1520];
+extern const uint8_t ASCII_1608[1520];
 
 void lcd_init(void)
 {
@@ -11,51 +12,23 @@ void lcd_init(void)
 	FSMC_NORSRAMTimingInitTypeDef  readWriteTiming; 
 	FSMC_NORSRAMTimingInitTypeDef  writeTiming;
 	
-	RCC_AHB3PeriphClockCmd(RCC_AHB3Periph_FSMC,ENABLE);
+	spi_config();	//触摸控制器SPI初始化
 	
-	portOutInit(GPIOB, 				//LCD背光控制脚
-				GPIO_Pin_1, 
-				GPIO_Mode_OUT, 
-				GPIO_OType_PP, 
-				GPIO_PuPd_UP, 
-				GPIO_Speed_50MHz);
-	portOutInit(GPIOF, 				//LCD复位引脚
-				GPIO_Pin_11, 
-				GPIO_Mode_OUT, 
-				GPIO_OType_PP, 
-				GPIO_PuPd_UP, 
-				GPIO_Speed_50MHz);
 	LCD_LED_A = 1;
 	LCD_RESET = 0;
 	delay_ms(100);
 	LCD_RESET = 1;
 	delay_ms(100);
 	
-	portOutInit(GPIOD, 
-				GPIO_Pin_0|GPIO_Pin_1|GPIO_Pin_4|GPIO_Pin_5|GPIO_Pin_8|GPIO_Pin_9
-					|GPIO_Pin_10|GPIO_Pin_14|GPIO_Pin_15,
-				GPIO_Mode_AF, 
-				GPIO_OType_PP, 
-				GPIO_PuPd_UP, 
-				GPIO_Speed_100MHz);
-	portOutInit(GPIOE, 
-				(0X1FF<<7),	//PE7~15
-				GPIO_Mode_AF, 
-				GPIO_OType_PP, 
-				GPIO_PuPd_UP, 
-				GPIO_Speed_100MHz);
-	portOutInit(GPIOF, 
-				GPIO_Pin_12,//FSMC_A6,接LCD_RS
-				GPIO_Mode_AF, 
-				GPIO_OType_PP, 
-				GPIO_PuPd_UP, 
-				GPIO_Speed_100MHz);
-	portOutInit(GPIOG, 
-				GPIO_Pin_12,//FSMC_NE4,接LCD_CS
-				GPIO_Mode_AF, 
-				GPIO_OType_PP, 
-				GPIO_PuPd_UP, 
-				GPIO_Speed_100MHz);
+	RCC_AHB3PeriphClockCmd(RCC_AHB3Periph_FSMC,ENABLE);
+	gpio_out_pp_up_init(GPIOB, GPIO_Pin_1); //LCD背光控制脚		
+	gpio_out_pp_up_init(GPIOF, GPIO_Pin_11);//LCD复位引脚
+	gpio_af_pp_up_init(GPIOD, GPIO_Pin_0|GPIO_Pin_1|GPIO_Pin_4|GPIO_Pin_5|GPIO_Pin_8
+						|GPIO_Pin_9|GPIO_Pin_10|GPIO_Pin_14|GPIO_Pin_15);
+	gpio_af_pp_up_init(GPIOE, (0X1FF<<7));	//PE7~15
+	gpio_af_pp_up_init(GPIOF, GPIO_Pin_12); //FSMC_A6,接LCD_RS
+	gpio_af_pp_up_init(GPIOG, GPIO_Pin_12); //FSMC_NE4,接LCD_CS
+
 	GPIO_PinAFConfig(GPIOD,GPIO_PinSource0,GPIO_AF_FSMC);	//FSMC_D2
 	GPIO_PinAFConfig(GPIOD,GPIO_PinSource1,GPIO_AF_FSMC);	//FSMC_D3
 	GPIO_PinAFConfig(GPIOD,GPIO_PinSource4,GPIO_AF_FSMC);	//FSMC_NOE
@@ -75,7 +48,6 @@ void lcd_init(void)
 	GPIO_PinAFConfig(GPIOE,GPIO_PinSource13,GPIO_AF_FSMC);	//FSMC_D10
 	GPIO_PinAFConfig(GPIOE,GPIO_PinSource14,GPIO_AF_FSMC);	//FSMC_D11
 	GPIO_PinAFConfig(GPIOE,GPIO_PinSource15,GPIO_AF_FSMC);	//FSMC_D12
-
 	GPIO_PinAFConfig(GPIOF,GPIO_PinSource12,GPIO_AF_FSMC);	//FSMC_A6
 	GPIO_PinAFConfig(GPIOG,GPIO_PinSource12,GPIO_AF_FSMC);	//FSMC_NE4
 	
@@ -114,8 +86,8 @@ void lcd_init(void)
 	FSMC_NORSRAMCmd(FSMC_Bank1_NORSRAM4, ENABLE);  // 使能BANK1-SECTOR4
 	
 	delay_ms(100);
-	
 	printf("LCD device id = %x\r\n", lcd_read_reg(0x0000));
+	
 	lcd_write_reg_data(0x00E5,0x78F0);
 	lcd_write_reg_data(0x0001,0x0100);
 	lcd_write_reg_data(0x0002,0x0700);
@@ -180,34 +152,36 @@ void lcd_init(void)
 
 	lcd_write_reg_data(0x0007,0x0133);
 	lcd_write_reg_data(0x00,0x0022);
+	
+	lcd_clear(WHITE);
 }
 
-void lcd_write_reg(u16 reg)
+void lcd_write_reg(uint16_t reg)
 {
 	reg=reg;			//使用-O2优化的时候,必须插入的延时
 	LCD->LCD_REG=reg;
 }
 
-void lcd_write_data(u16 dat)
+void lcd_write_data(uint16_t dat)
 {
 	dat=dat;			//使用-O2优化的时候,必须插入的延时
 	LCD->LCD_RAM=dat;	
 }
 
-void lcd_write_reg_data(u16 reg, u16 dat)
+void lcd_write_reg_data(uint16_t reg, uint16_t dat)
 {
 	lcd_write_reg(reg);
 	lcd_write_data(dat);
 }
 
-u16 lcd_read_data(void)
+uint16_t lcd_read_data(void)
 {
-	vu16 ram;			//防止被优化
+	volatile uint16_t ram;			//防止被优化
 	ram=LCD->LCD_RAM;
 	return ram;
 }
 
-u16 lcd_read_reg(u16 reg)
+uint16_t lcd_read_reg(uint16_t reg)
 {
 	lcd_write_reg(reg);
 	delay_us(5);
@@ -219,24 +193,24 @@ void lcd_prepare_write_ram(void)
 	LCD->LCD_REG = 0X0022;
 }
 
-void lcd_write_ram(u16 color)
+void lcd_write_ram(uint16_t color)
 {
 	color = color;
 	LCD->LCD_RAM = color;
 }
 
-void lcd_set_cursor(u16 x, u16 y)
+void lcd_set_cursor(uint16_t x, uint16_t y)
 {
 	lcd_write_reg_data(0X0020, x);
 	lcd_write_reg_data(0X0021, y);
 }
 
-void opt_delay(u8 n)
+void opt_delay(uint8_t n)
 {
 	while(n--);
 }
 
-u16 lcd_read_point_color(u16 x, u16 y)
+uint16_t lcd_read_point_color(uint16_t x, uint16_t y)
 {
 	lcd_set_cursor(x, y);
 	lcd_write_reg(0X0022);
@@ -255,7 +229,7 @@ void lcd_display_off(void)
 	lcd_write_reg_data(0X0007, 0X0000);
 }
 
-void lcd_set_window(u16 x1, u16 y1, u16 x2, u16 y2)
+void lcd_set_window(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2)
 {
 	lcd_write_reg_data(0x0050, x1);
 	lcd_write_reg_data(0x0052, y1);
@@ -265,7 +239,7 @@ void lcd_set_window(u16 x1, u16 y1, u16 x2, u16 y2)
 	lcd_write_reg(0x0022);
 }
 
-void lcd_clear(u16 color)
+void lcd_clear(uint16_t color)
 {
 	u32 i = 0;
 	lcd_set_window(0, 0, LCD_W-1, LCD_H-1);
@@ -274,13 +248,13 @@ void lcd_clear(u16 color)
 	}
 }
 
-void lcd_draw_point(u16 x, u16 y, u16 color)
+void lcd_draw_point(uint16_t x, uint16_t y, uint16_t color)
 {
 	lcd_set_window(x, y, x, y);
 	lcd_write_data(color);
 }
 
-void lcd_fill(u16 xStart, u16 yStart, u16 xEnd, u16 yEnd, u16 color)
+void lcd_fill(uint16_t xStart, uint16_t yStart, uint16_t xEnd, uint16_t yEnd, uint16_t color)
 {
 	u32 i = 0;
 	lcd_set_window(xStart, yStart, xEnd, yEnd);
@@ -289,14 +263,14 @@ void lcd_fill(u16 xStart, u16 yStart, u16 xEnd, u16 yEnd, u16 color)
 	}
 }
 
-void lcd_draw_big_point(u16 x, u16 y, u16 color)
+void lcd_draw_big_point(uint16_t x, uint16_t y, uint16_t color)
 {
 	lcd_fill(x-1, y-1, x+1, y+1, color);
 }
 
-void lcd_draw_line(u16 x1, u16 y1, u16 x2, u16 y2, u16 color)
+void lcd_draw_line(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color)
 {
-	u16 t; 
+	uint16_t t; 
 	int xerr=0, yerr=0, delta_x, delta_y, distance; 
 	int incx, incy, uRow, uCol; 
 
@@ -344,7 +318,7 @@ void lcd_draw_line(u16 x1, u16 y1, u16 x2, u16 y2, u16 color)
 	} 
 }
 
-void lcd_draw_rectangle(u16 x1, u16 y1, u16 x2, u16 y2, u16 color)
+void lcd_draw_rectangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color)
 {
 	lcd_draw_line(x1,y1,x2,y1, color);
 	lcd_draw_line(x1,y1,x1,y2, color);
@@ -352,7 +326,7 @@ void lcd_draw_rectangle(u16 x1, u16 y1, u16 x2, u16 y2, u16 color)
 	lcd_draw_line(x2,y1,x2,y2, color);
 }
 
-void lcd_draw_circle(u16 x0, u16 y0, u8 r, u16 color)
+void lcd_draw_circle(uint16_t x0, uint16_t y0, uint8_t r, uint16_t color)
 {
 	int a,b;
 	int di;
@@ -383,11 +357,11 @@ void lcd_draw_circle(u16 x0, u16 y0, u8 r, u16 color)
 	}
 }
 
-void lcd_show_char(u16 x, u16 y, u8 num, u16 color)
+void lcd_show_char(uint16_t x, uint16_t y, uint8_t num, uint16_t color)
 {
-    u8 temp;
-    u8 pos,t;
-	u16 x0;
+    uint8_t temp;
+    uint8_t pos,t;
+	uint16_t x0;
 	x++;
 	x0=x;     
     if(x > LCD_W-16 || y > LCD_H-16){
@@ -396,7 +370,7 @@ void lcd_show_char(u16 x, u16 y, u8 num, u16 color)
 	num=num-' ';							 //得到偏移后的值
 	for(pos=0; pos<16; pos++)
 	{ 
-		temp = ASCII_1608[(u16)num*16+pos];	 //调用1608字体
+		temp = ASCII_1608[(uint16_t)num*16+pos];	 //调用1608字体
 		for(t=0; t<8; t++)
 		{                 
 			if(temp & 0x01){
@@ -410,7 +384,7 @@ void lcd_show_char(u16 x, u16 y, u8 num, u16 color)
 	}		   	 	  
 }
 
-void lcd_show_str(u16 x, u16 y, const char *p, u16 color)
+void lcd_show_str(uint16_t x, uint16_t y, const char *p, uint16_t color)
 {         
     while(*p!='\0')
     {
@@ -428,7 +402,7 @@ void lcd_show_str(u16 x, u16 y, const char *p, u16 color)
     }  
 }
 
-void lcd_show_num(u16 x, u16 y, u32 num, u16 color)
+void lcd_show_num(uint16_t x, uint16_t y, u32 num, uint16_t color)
 {
 	char str[10] = {0};
 	sprintf(str, "%d", num);

@@ -507,6 +507,11 @@
               <FileType>1</FileType>
               <FilePath>..\Drivers\pwm.c</FilePath>
             </File>
+            <File>
+              <FileName>spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Drivers\spi.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -532,6 +537,21 @@
               <FileType>1</FileType>
               <FilePath>..\Modules\motor.c</FilePath>
             </File>
+            <File>
+              <FileName>font.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Modules\LCD\font.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Modules\LCD\lcd.c</FilePath>
+            </File>
+            <File>
+              <FileName>touch.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Modules\LCD\touch.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -556,6 +576,11 @@
               <FileName>lqr.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\lqr.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\gui.c</FilePath>
             </File>
           </Files>
         </Group>

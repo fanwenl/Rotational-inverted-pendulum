@@ -52,7 +52,7 @@ void encoder2_init(void)
 	
 	TIM_DeInit(TIM5);
 	TIM_TimeBaseStructure.TIM_Prescaler = 0;
-	TIM_TimeBaseStructure.TIM_Period = ENCODER_RELOAD;	//TIM2为32位定时器,这里把重载值设为最大，可以不考虑计数溢出
+	TIM_TimeBaseStructure.TIM_Period = ENCODER_RELOAD;	//TIM5为32位定时器,这里把重载值设为最大，可以不考虑计数溢出
 	TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
 	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
 	TIM_TimeBaseInit(TIM5,&TIM_TimeBaseStructure);
@@ -79,10 +79,10 @@ void TIM6_DAC_IRQHandler(void)
 		cnt2 = TIM5->CNT;
 		tmp1 = (int32_t)(cnt1-COUNTER_RESET)>=0? (cnt1-COUNTER_RESET)%(4*ENCODER_PPR) : 4*ENCODER_PPR-(COUNTER_RESET-cnt1)%(4*ENCODER_PPR);
 		tmp2 = (int32_t)(cnt2-COUNTER_RESET)>=0? (cnt2-COUNTER_RESET)%(4*ENCODER_PPR) : 4*ENCODER_PPR-(COUNTER_RESET-cnt2)%(4*ENCODER_PPR);
-		x1 = tmp1/(4.0f*ENCODER_PPR)*360.0f;
-		x2 = tmp2/(4.0f*ENCODER_PPR)*360.0f;
-		x3 = (float)((int32_t)(cnt1-last_counter1)/(4.0f*ENCODER_PPR)*360.0f*100.0f);
-		x4 = (float)((int32_t)(cnt2-last_counter2)/(4.0f*ENCODER_PPR)*360.0f*100.0f);
+		x1 = tmp1/(4.0f*ENCODER_PPR)*360.0f-180.0f;
+		x2 = tmp2/(4.0f*ENCODER_PPR)*360.0f-180.0f;
+		x3 = (float)((int32_t)(cnt1-last_counter1)/(4.0f*ENCODER_PPR)*360.0f*1000.0f);
+		x4 = (float)((int32_t)(cnt2-last_counter2)/(4.0f*ENCODER_PPR)*360.0f*1000.0f);
 		last_counter1 = cnt1;
 		last_counter2 = cnt2;
 		motor_set_pwm(lqr_get_pwm());

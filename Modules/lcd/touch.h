@@ -6,9 +6,6 @@
 #define CMD_RDX 0XD0
 #define CMD_RDY 0X90
 
-#define T_CS	PaOutBit(3)
-#define T_IRQ	PcInBit(5)
-
 u16 readAdc(u8 cmd);
 u16 readFilterAdc(u8 cmd);
 u8 readTouchPos(u16 *x,u16 *y);
