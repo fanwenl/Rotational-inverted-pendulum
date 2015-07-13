@@ -6,6 +6,10 @@
 #include "stm32f4_discovery.h"
 #include "gpio.h"
 #include "timer.h"
+#include "touch.h"
+#include "spi.h"
+#include "lcd.h"
+#include "gui.h"
 
 int main()
 {
@@ -20,6 +24,7 @@ int main()
 	while(1){
 		STM_EVAL_LEDToggle(LED4);
 		delay_ms(1000);
+		gui_drawHome();
 	}
 }
 
