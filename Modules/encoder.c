@@ -2,6 +2,12 @@
 #include "gpio.h"
 #include "util.h"
 #include "usart.h"
+#include "timer.h"
+
+float x1 = 0;	//旗글실똑(똑)
+float x2 = 0;	//겠맷실똑(똑)
+float x3 = 0;	//旗글실醵똑(똑/취)
+float x4 = 0;	//겠맷실醵똑(똑/취)
 
 void encoder_init(void)
 {
@@ -28,4 +34,14 @@ void encoder_init(void)
 	
 	TIM2->CNT = COUNTER_RESET;
 	TIM_Cmd(TIM2, ENABLE);
+	TIM6_init(100, 8400);//10ms
+}
+
+void TIM6_DAC_IRQHandler(void)
+{
+	if(TIM_GetITStatus(TIM6, TIM_IT_Update) == SET)
+	{
+		TIM_ClearITPendingBit(TIM6, TIM_IT_Update);
+		
+	}
 }

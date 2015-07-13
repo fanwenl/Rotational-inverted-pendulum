@@ -19,16 +19,6 @@ void TIM6_init(uint32_t period, uint16_t prescaler)
 	nvic_config(TIM6_DAC_IRQn, 2);	//优先级暂定为2
 }
 
-void TIM6_DAC_IRQHandler(void)
-{
-	if(TIM_GetITStatus(TIM6, TIM_IT_Update) == SET)
-	{
-		TIM_ClearITPendingBit(TIM6, TIM_IT_Update);
-		printf("hello world! ");
-	}
-}
-
-
 //TIM7挂在APB1，输入时钟为42*2=84MHz
 void TIM7_init(uint32_t period, uint16_t prescaler)
 {
