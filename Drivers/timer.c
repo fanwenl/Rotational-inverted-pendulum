@@ -16,7 +16,7 @@ void TIM6_init(uint32_t period, uint16_t prescaler)
     TIM_TimeBaseInit(TIM6, &TIM_TimeBaseStructure);  
     TIM_Cmd (TIM6, ENABLE);
 	TIM_ITConfig(TIM6, TIM_IT_Update, ENABLE);
-	nvic_config(TIM6_DAC_IRQn, 2);	//优先级暂定为2
+	nvic_config(TIM6_DAC_IRQn, 1);	//优先级暂定为1
 }
 
 //TIM7挂在APB1，输入时钟为42*2=84MHz

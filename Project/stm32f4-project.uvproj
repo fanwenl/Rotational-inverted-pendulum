@@ -146,7 +146,7 @@
             <UsePdscDebugDescription>1</UsePdscDebugDescription>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
-          <TargetSelection>11</TargetSelection>
+          <TargetSelection>6</TargetSelection>
           <SimDlls>
             <CpuDll></CpuDll>
             <CpuDllArguments></CpuDllArguments>
@@ -160,7 +160,7 @@
             <PeripheralDll></PeripheralDll>
             <PeripheralDllArguments></PeripheralDllArguments>
             <InitializationFile></InitializationFile>
-            <Driver>STLink\ST-LINKIII-KEIL_SWO.dll</Driver>
+            <Driver>Segger\JL2CM3.dll</Driver>
           </TargetDlls>
         </DebugOption>
         <Utilities>
@@ -502,6 +502,16 @@
               <FileType>1</FileType>
               <FilePath>..\Drivers\timer.c</FilePath>
             </File>
+            <File>
+              <FileName>pwm.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Drivers\pwm.c</FilePath>
+            </File>
+            <File>
+              <FileName>micros_time_16.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Drivers\micros_time_16.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -513,19 +523,14 @@
               <FilePath>..\Modules\encoder.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4_discovery.c</FileName>
+              <FileName>motor.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Modules\stm32f4_discovery.c</FilePath>
+              <FilePath>..\Modules\motor.c</FilePath>
             </File>
             <File>
-              <FileName>font.c</FileName>
+              <FileName>nano_board.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Modules\LCD\font.c</FilePath>
-            </File>
-            <File>
-              <FileName>lcd.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Modules\LCD\lcd.c</FilePath>
+              <FilePath>..\Modules\nano_board.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -546,6 +551,11 @@
               <FileName>util.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\util.c</FilePath>
+            </File>
+            <File>
+              <FileName>lqr.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\lqr.c</FilePath>
             </File>
           </Files>
         </Group>

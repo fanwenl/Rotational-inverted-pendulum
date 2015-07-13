@@ -15,6 +15,8 @@ void nano_board_led2_off(void);
 void nano_board_led3_off(void);
 void nano_board_led2_toggle(void);
 void nano_board_led3_toggle(void);
+void nano_board_led2_twinkle(void);
+void nano_board_led3_twinkle(void);
 void nano_board_key_init(void);
 u8 is_nano_board_key_down(void);
 

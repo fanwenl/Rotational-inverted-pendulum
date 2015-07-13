@@ -3,23 +3,32 @@
 #include "usart.h"
 #include "delay.h"
 #include "encoder.h"
-#include "stm32f4_discovery.h"
+#include "nano_board.h"
 #include "gpio.h"
 #include "timer.h"
+#include "motor.h"
+#include "micros_time_16.h"
 
 int main()
 {
+//	float duty_cycle = 0;
 	rcc_clock_enable();
 	delay_config();
-	usart_config(UART4, 115200);
+	uart4_init(115200);
 	print_clock_freq();
-	//encoder_init();
-	STM_EVAL_LEDInit(LED4);
-	TIM7_init(10000, 8400);
+	nano_board_led_init();
+	
+//	micros_time_16_init();
+	encoder1_init();
+	encoder2_init();
+	motor_init();
+	TIM6_init(100, 8400);//10ms
 	
 	while(1){
-		STM_EVAL_LEDToggle(LED4);
-		delay_ms(1000);
+//		printf("input duty cycle: ");
+//		scanf("%f", &duty_cycle);
+//		printf("\r\n");
+//		motor_set_pwm(duty_cycle);
 	}
 }
 

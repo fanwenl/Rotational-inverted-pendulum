@@ -56,6 +56,22 @@ void nano_board_led3_toggle(void)
 	}
 }
 
+void nano_board_led2_twinkle(void)
+{
+	nano_board_led2_on();
+	delay_ms(250);
+	nano_board_led2_off();
+	delay_ms(250);
+}
+
+void nano_board_led3_twinkle(void)
+{
+	nano_board_led3_on();
+	delay_ms(250);
+	nano_board_led3_off();
+	delay_ms(250);
+}
+
 void nano_board_key_init(void)
 {
 	gpio_in_up_init(GPIOC, GPIO_Pin_0);

@@ -3,13 +3,10 @@
 
 #include "stm32f4xx_tim.h"
 
-void pwm_config(uint16_t freq);
-void set_pwm1(u16 compare);
-void set_pwm2(u16 compare);
-void set_pwm3(u16 compare);
-void set_pwm4(u16 compare);
-void set_pwm(u16 val1, u16 val2, u16 val3, u16 val4);
-
+void pwm_config(uint32_t freq);
+void set_pwm1(float compare);
+void set_pwm2(float compare);
+void set_pwm(float pwm1, float pwm2);
 
 #endif
 
