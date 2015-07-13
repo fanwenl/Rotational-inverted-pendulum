@@ -7,6 +7,7 @@ del /f /s /q .\Project\*.plg
 del /f /s /q .\Project\*.Administrator
 del /f /s /q .\Project\*.bak
 del /f /s /q .\Project\*.uvopt
+del /f /s /q .\Project\*uvoptx
 del /f /s /q .\Project\*.dep
 del /f /s /q .\Project\*.txt
 del /f /s /q .\Project\*.ini

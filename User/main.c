@@ -8,6 +8,10 @@
 #include "timer.h"
 #include "motor.h"
 #include "micros_time_16.h"
+#include "touch.h"
+#include "spi.h"
+#include "lcd.h"
+#include "gui.h"
 
 int main()
 {
