@@ -3,7 +3,7 @@
 
 void motor_init(void)
 {
-	pwm_config(84000);
+	pwm_config(21000);
 }
 
 void motor_set_pwm(float pwm)

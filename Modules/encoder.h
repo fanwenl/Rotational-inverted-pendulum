@@ -3,9 +3,11 @@
 
 #include "stm32f4xx_tim.h"
 
-#define ENCODER_PPR 		(500*16)
+#define ENCODER1_PPR 		(500*16)		//电机编码器线数
+#define ENCODER2_PPR 		(1000)			//摆杆编码器线数
 #define ENCODER_RELOAD 		0XFFFFFFFF
-#define COUNTER_RESET 		0X7FFFFFFF
+#define COUNTER1_RESET 		(0X7FFFFFFF)
+#define COUNTER2_RESET 		(0X7FFFFFFF+126)
 
 extern float x1;	//旋臂角度(度)
 extern float x2;	//摆杆角度(度)

@@ -74,7 +74,7 @@ void nano_board_led3_twinkle(void)
 
 void nano_board_key_init(void)
 {
-	gpio_in_up_init(GPIOC, GPIO_Pin_0);
+	gpio_in_up_init(GPIOA, GPIO_Pin_0);
 }
 
 u8 is_nano_board_key_down(void)

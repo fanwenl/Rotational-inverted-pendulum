@@ -2,6 +2,8 @@
 #include "util.h"
 #include "gpio.h"
 #include "usart.h"
+#include "micros_time_16.h"
+#include "encoder.h"
 
 void exti_config(GPIO_TypeDef *gpiox, u8 pin_num)
 {
@@ -76,27 +78,11 @@ void exti_config(GPIO_TypeDef *gpiox, u8 pin_num)
 //EXTI2_IRQHandler 
 //EXTI3_IRQHandler 
 //EXTI4_IRQHandler
-void EXTI0_IRQHandler(void)
+//EXTI9_5_IRQHandler
+//EXTI15_10_IRQHandler
+void EXTI4_IRQHandler(void)
 {
-	if(EXTI_GetITStatus(EXTI_Line0) != RESET){
-		EXTI_ClearITPendingBit(EXTI_Line0);
-		
+	if(EXTI_GetITStatus(EXTI_Line4) != RESET){
+		EXTI_ClearITPendingBit(EXTI_Line4);
 	}
-}
-
-void EXTI9_5_IRQHandler(void)
-{
-	if(EXTI_GetITStatus(EXTI_Line5) != RESET){
-		EXTI_ClearITPendingBit(EXTI_Line5);
-		
-	}
-	else if(EXTI_GetITStatus(EXTI_Line6) != RESET){
-		EXTI_ClearITPendingBit(EXTI_Line6);
-		
-	}
-}
-
-void EXTI15_10_IRQHandler(void)
-{
-	
 }
