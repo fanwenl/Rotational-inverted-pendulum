@@ -35,9 +35,31 @@ uint8_t isInRange(uint16_t xPos, uint16_t yPos, uint16_t appx, uint16_t appy)
 	}
 }
 
+#include "motor.h"
+#include "delay.h"
+#include "encoder.h"
+#include <math.h>
+#define PWM_GAIN	(80)
+#define PI			(3.1415926f)
 void side_to_side(void)
 {
-	printf("side_to_side\r\n");
+	static int8_t dir_flag = 0;
+	float Ep, Ev;
+	while(1){
+		if(x4*cos(x2*PI/180.0f) < 0){
+			dir_flag = 1;	//正转
+		}
+		else{
+			dir_flag = -1;	//反转
+		}
+		Ep = 0.004173f;
+		Ev = 0.000356f*(x4*PI/180)*(x4*PI/180)+0.002082f*(1+cos(x2*PI/180.0f));
+		//pwm = -dir_flag*(Ep-Ev)/Ep*PWM_GAIN;
+		pwm = -dir_flag*20;
+		//printf("x2=%f, x4=%f, dir_flag=%d, Ep=%f, Ev=%f, pwm=%f\r\n", x2, x4, dir_flag, Ep, Ev, pwm);
+		delay_ms(100);
+		motor_set_pwm(pwm);
+	}
 }
 
 void starts_swinging(void)

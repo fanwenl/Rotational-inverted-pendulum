@@ -4,10 +4,10 @@
 
 float u;
 float lqr_k1 = -3.1623f;
-float lqr_k2 = 23.9034f;
-float lqr_k3 = -2.1017f;
-float lqr_k4 = 2.6800f;
-float gain = 20;
+float lqr_k2 = 26.7150f;
+float lqr_k3 = -2.1897f;
+float lqr_k4 = 2.7112f;
+float gain = 60;
 
 float lqr_get_pwm(void)
 {

@@ -19,6 +19,7 @@ extern uint32_t overflew_vounter;
 extern uint8_t start_flag;
 extern float u;
 uint8_t mask = 0;
+
 int main()
 {
 	rcc_clock_enable();
@@ -35,17 +36,17 @@ int main()
 	encoder2_init();
 	gui_drawHome();		
 
-	read_parameter();
+//	read_parameter();
 	//printf("gain=%6.3f, k1=%6.3f, k2=%6.3f, k3=%6.3f, k4=%6.3f\r\n", gain, lqr_k1, lqr_k2, lqr_k3, lqr_k4);
 	
 	while(1){
-		//invoking();
+		invoking();
 		//printf("u=%10.3f, x1=%6.3f, x2=%6.3f, x3=%6.3f, x4=%6.3f\r\n", u, x1, x2, x3, x4);
+		//delay_ms(100);
 		//printf("gain=%6.3f, k1=%6.3f, k2=%6.3f, k3=%6.3f, k4=%6.3f\r\n", gain, lqr_k1, lqr_k2, lqr_k3, lqr_k4);
-		//delay_ms(250);
 //		printf("%d\r\n", get_interval_time2());
 		if(start_flag == 0 && mask == 0){
-			read_parameter();
+			save_parameter();
 			mask = 1;
 		}
 		if(start_flag == 1){

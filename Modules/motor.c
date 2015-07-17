@@ -1,22 +1,34 @@
 #include "motor.h"
 #include "pwm.h"
+#include "gpio.h"
+
+float pwm;
 
 void motor_init(void)
 {
-	pwm_config(21000);
+	gpio_out_pp_up_init(GPIOE, GPIO_Pin_1|GPIO_Pin_2);
+	MOTOR_IN1 = 0;
+	MOTOR_IN2 = 0;
+	pwm_config(1000);
 }
 
 void motor_set_pwm(float pwm)
 {
-	float pwm1, pwm2;
-	if(pwm>=0){
-		pwm1 = pwm;
-		pwm2 = 0;
+	if(pwm>0){
+		MOTOR_IN1 = 1;
+		MOTOR_IN2 = 0;
+		set_pwm1(pwm);
+	}
+	else if(pwm<0){
+		MOTOR_IN1 = 0;
+		MOTOR_IN2 = 1;
+		set_pwm1(-pwm);
 	}
 	else{
-		pwm1 = 0;
-		pwm2 = -pwm;
+		MOTOR_IN1 = 0;
+		MOTOR_IN2 = 0;
+		set_pwm1(0);
 	}
-	set_pwm(pwm1, pwm2);
+	
 }
 

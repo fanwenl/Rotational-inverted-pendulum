@@ -5,13 +5,15 @@
 #include "timer.h"
 #include "lqr.h"
 #include "motor.h"
+#include <math.h>
 
 float x1 = 0;	//旗글실똑(똑)
 float x2 = 0;	//겠맷실똑(똑)
 float x3 = 0;	//旗글실醵똑(똑/취)
 float x4 = 0;	//겠맷실醵똑(똑/취)
 
-static uint32_t get_cnt_buffer_last_cnt(uint8_t index, uint32_t *p_cnt_buffer);
+static uint32_t get_cnt1_buffer_last_cnt(uint8_t index, uint32_t *p_cnt_buffer);
+static uint32_t get_cnt2_buffer_last_cnt(uint8_t index, uint32_t *p_cnt_buffer);
 static float calc_angle_speed1(uint32_t cnt);
 static float calc_angle_speed2(uint32_t cnt);
 
@@ -36,8 +38,10 @@ void encoder1_init(void)
 	TIM_TimeBaseInit(TIM2,&TIM_TimeBaseStructure);
 	TIM_EncoderInterfaceConfig(TIM2, TIM_EncoderMode_TI12, TIM_ICPolarity_Rising, TIM_ICPolarity_Rising);
 	
+//	TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);
+	
 	TIM_ICStructInit(&TIM_ICInitStructure);
-	TIM_ICInitStructure.TIM_ICFilter = 6;
+	TIM_ICInitStructure.TIM_ICFilter = 0;
 	TIM_ICInit(TIM2, &TIM_ICInitStructure);
 	
 	TIM2->CNT = COUNTER1_RESET;
@@ -65,7 +69,7 @@ void encoder2_init(void)
 	TIM_EncoderInterfaceConfig(TIM5, TIM_EncoderMode_TI12, TIM_ICPolarity_Rising, TIM_ICPolarity_Rising);
 	
 	TIM_ICStructInit(&TIM_ICInitStructure);
-	TIM_ICInitStructure.TIM_ICFilter = 6;
+	TIM_ICInitStructure.TIM_ICFilter = 0;
 	TIM_ICInit(TIM5, &TIM_ICInitStructure);
 	
 	TIM5->CNT = COUNTER2_RESET;
@@ -99,16 +103,47 @@ void send_x1_x2(void)
 	usart_sendBytes(UART4, buffer, BUFFER_SIZE);
 }
 
+#define FILTER_BUFFER_SIZE	5
+float angle1_speed_filter(float in)
+{
+	float sum=0;
+	uint16_t i = 0;
+	static float buffer[FILTER_BUFFER_SIZE] = {0};
+	for(i=FILTER_BUFFER_SIZE-1; i>0; i--){
+		buffer[i] = buffer[i-1];
+	}
+	buffer[0] = in;
+	for(i=0; i<FILTER_BUFFER_SIZE; i++){
+		sum += buffer[i];
+	}
+	return sum/FILTER_BUFFER_SIZE;
+}
+
+#define FILTER2_BUFFER_SIZE	10
+float angle2_speed_filter(float in)
+{
+	float sum=0;
+	uint16_t i = 0;
+	static float buffer[FILTER2_BUFFER_SIZE] = {0};
+	for(i=FILTER2_BUFFER_SIZE-1; i>0; i--){
+		buffer[i] = buffer[i-1];
+	}
+	buffer[0] = in;
+	for(i=0; i<FILTER2_BUFFER_SIZE; i++){
+		sum += buffer[i];
+	}
+	return sum/FILTER2_BUFFER_SIZE;
+}
+
 extern uint8_t start_flag;
-float pwm;
 void TIM6_DAC_IRQHandler(void)
 {
-//	static uint32_t last1 = COUNTER_RESET;
-//	static uint32_t last2 = COUNTER_RESET;
+	static uint32_t last1 = COUNTER1_RESET;
+	static uint32_t last2 = COUNTER2_RESET;
 	
 	uint32_t cnt1, cnt2;
 	int32_t tmp1, tmp2;
-	float tmp;
+	float tmp, x4_tmp;
 	if(TIM_GetITStatus(TIM6, TIM_IT_Update) == SET)
 	{
 		TIM_ClearITPendingBit(TIM6, TIM_IT_Update);
@@ -118,54 +153,66 @@ void TIM6_DAC_IRQHandler(void)
 		tmp2 = (int32_t)(cnt2-COUNTER2_RESET)>=0? (cnt2-COUNTER2_RESET)%(4*ENCODER2_PPR) : 4*ENCODER2_PPR-(COUNTER2_RESET-cnt2)%(4*ENCODER2_PPR);
 		tmp = tmp1/(4.0f*ENCODER1_PPR)*360.0f;
 		x1 = (tmp>180)? 360-tmp : -tmp;
-		x2 = -(tmp2/(4.0f*ENCODER2_PPR)*360.0f-180.0f);
+		x2 = (tmp2/(4.0f*ENCODER2_PPR)*360.0f-180.0f);
+
+		//x3 = -calc_angle_speed1(cnt1);
+		//x4 = -calc_angle_speed2(cnt2);
 		
-		x3 = -calc_angle_speed1(cnt1);
-		x4 = -calc_angle_speed2(cnt2);
-		
-//		x3 = (float)((int32_t)(last1-cnt1)/(4.0f*ENCODER1_PPR)*360.0f*100.0f);
-//		last1 = cnt1;
-//		x4 = (float)((int32_t)(last2-cnt2)/(4.0f*ENCODER2_PPR)*360.0f*100.0f);
-//		last2 = cnt2;
-		
-		pwm = lqr_get_pwm();
-		if(start_flag){
-			motor_set_pwm(pwm);
-		}
-		else{
-			motor_set_pwm(0);
-		}
+		x3 = (float)((int32_t)(last1-cnt1)/(4.0f*ENCODER1_PPR)*360.0f*100.0f);
+		//x3 = angle1_speed_filter(x3);
+		last1 = cnt1;
+		x4_tmp = (float)((int32_t)(cnt2-last2)/(4.0f*ENCODER2_PPR)*360.0f*100.0f);
+		x4 = angle2_speed_filter(x4_tmp);
+		last2 = cnt2;
+//		if(fabs(x2) < 90){
+//			pwm = lqr_get_pwm();
+//			if(start_flag){
+//				motor_set_pwm(pwm);
+//			}
+//			else{
+//				motor_set_pwm(0);
+//			}
+//		}
+//		else{
+//			motor_set_pwm(0);
+//		}
 		send_x1_x2();
 	}
 }
 
-
-#define CNT_BUFFER_SIZE	2
-static uint32_t get_cnt_buffer_last_cnt(uint8_t index, uint32_t *p_cnt_buffer)
+#define CNT1_BUFFER_SIZE	8
+static uint32_t get_cnt1_buffer_last_cnt(uint8_t index, uint32_t *p_cnt_buffer)
 {
 	uint32_t res;
-	res = (index == CNT_BUFFER_SIZE-1)? 0 : index+1;
+	res = (index == CNT1_BUFFER_SIZE-1)? 0 : index+1;
+	return p_cnt_buffer[res];
+}
+#define CNT2_BUFFER_SIZE	2
+static uint32_t get_cnt2_buffer_last_cnt(uint8_t index, uint32_t *p_cnt_buffer)
+{
+	uint32_t res;
+	res = (index == CNT2_BUFFER_SIZE-1)? 0 : index+1;
 	return p_cnt_buffer[res];
 }
 
 static float calc_angle_speed1(uint32_t cnt)
 {
-	static uint32_t cnt_buffer[CNT_BUFFER_SIZE] = {0};
+	static uint32_t cnt_buffer[CNT1_BUFFER_SIZE] = {0};
 	static uint8_t index = 0;
 	float angle_speed;
 	cnt_buffer[index] = cnt;
-	angle_speed = (float)((int32_t)(cnt-get_cnt_buffer_last_cnt(index, cnt_buffer))/(4.0f*ENCODER1_PPR)*360.0f*100/(CNT_BUFFER_SIZE));
-	index = (index == CNT_BUFFER_SIZE-1)? 0 : index+1;
+	angle_speed = (float)((int32_t)(cnt-get_cnt1_buffer_last_cnt(index, cnt_buffer))/(4.0f*ENCODER1_PPR)*360.0f*100/(CNT1_BUFFER_SIZE));
+	index = (index == CNT1_BUFFER_SIZE-1)? 0 : index+1;
 	return angle_speed;
 }
 
 static float calc_angle_speed2(uint32_t cnt)
 {
-	static uint32_t cnt_buffer[CNT_BUFFER_SIZE] = {0};
+	static uint32_t cnt_buffer[CNT2_BUFFER_SIZE] = {0};
 	static uint8_t index = 0;
 	float angle_speed;
 	cnt_buffer[index] = cnt;
-	angle_speed = (float)((int32_t)(cnt-get_cnt_buffer_last_cnt(index, cnt_buffer))/(4.0f*ENCODER2_PPR)*360.0f*100/(CNT_BUFFER_SIZE));
-	index = (index == CNT_BUFFER_SIZE-1)? 0 : index+1;
+	angle_speed = (float)((int32_t)(cnt-get_cnt2_buffer_last_cnt(index, cnt_buffer))/(4.0f*ENCODER2_PPR)*360.0f*100/(CNT2_BUFFER_SIZE));
+	index = (index == CNT2_BUFFER_SIZE-1)? 0 : index+1;
 	return angle_speed;
 }

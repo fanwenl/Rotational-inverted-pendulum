@@ -7,7 +7,7 @@
 #define ENCODER2_PPR 		(1000)			//摆杆编码器线数
 #define ENCODER_RELOAD 		0XFFFFFFFF
 #define COUNTER1_RESET 		(0X7FFFFFFF)
-#define COUNTER2_RESET 		(0X7FFFFFFF+126)
+#define COUNTER2_RESET 		(0X7FFFFFFF)
 
 extern float x1;	//旋臂角度(度)
 extern float x2;	//摆杆角度(度)

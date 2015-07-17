@@ -11,7 +11,7 @@ extern float gain;
 extern float u;
 
 //电机输入电压最大值
-#define U_MAX	(20)
+#define U_MAX	(12)
 
 float lqr_get_pwm(void);
 
